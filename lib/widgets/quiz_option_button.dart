@@ -8,6 +8,10 @@ class QuizOptionButton extends StatelessWidget {
   final bool isAnswerSubmitted;
   final int? correctAnswerIndex;
 
+  final double? customWidth;
+  final double? customFontSize;
+
+
   const QuizOptionButton({
     super.key,
     required this.text,
@@ -16,6 +20,8 @@ class QuizOptionButton extends StatelessWidget {
     required this.selectedIndex,
     this.isAnswerSubmitted = false,
     this.correctAnswerIndex,
+    this.customWidth,
+    this.customFontSize,
   });
 
   Color _getBackgroundColor() {
@@ -60,10 +66,15 @@ class QuizOptionButton extends StatelessWidget {
     final bgColor = _getBackgroundColor();
     final textColor = _getTextColor();
     final icon = _getIcon();
+  
+    final calculatedWidth = customWidth ?? screenWidth * 0.80;
+    final calculatedPadding = calculatedWidth * 0.05; 
+    final calculatedFontSize = customFontSize ?? screenWidth * 0.05;
+
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenHeight * 0.012),
-      width: screenWidth * 0.80,
+      width: calculatedWidth,
       height: screenHeight * 0.09,
       decoration: BoxDecoration(
         boxShadow: [
@@ -83,10 +94,10 @@ class QuizOptionButton extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: isAnswerSubmitted ? null : onPressed,
+          onTap: isAnswerSubmitted ? null : onPressed, 
           borderRadius: BorderRadius.circular(15.0),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+            padding: EdgeInsets.symmetric(horizontal: calculatedPadding), 
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -95,7 +106,7 @@ class QuizOptionButton extends StatelessWidget {
                     text,
                     style: TextStyle(
                       fontFamily: 'SmartifyFont',
-                      fontSize: screenWidth * 0.05,
+                      fontSize: calculatedFontSize, 
                       color: textColor,
                       fontWeight: isAnswerSubmitted || optionIndex == selectedIndex ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -104,7 +115,7 @@ class QuizOptionButton extends StatelessWidget {
                 Icon(
                   icon,
                   color: textColor,
-                  size: screenWidth * 0.06,
+                  size: calculatedFontSize * 1.2, 
                 ),
               ],
             ),

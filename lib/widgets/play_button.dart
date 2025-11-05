@@ -1,3 +1,5 @@
+// lib/widgets/play_button.dart
+
 import 'package:flutter/material.dart';
 
 class PlayButton extends StatelessWidget {
@@ -16,13 +18,15 @@ class PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return GestureDetector(
       onTap: onPressed,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: const Color(0xFF3B89A3),
+          color: colorScheme.secondary, // Menggunakan secondary color
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [
             BoxShadow(

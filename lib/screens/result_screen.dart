@@ -1,8 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:utspemob/models/quiz_model.dart';
 import 'package:utspemob/widgets/circle_widgets.dart';
 import 'package:utspemob/screens/home_screen.dart';
 import 'package:utspemob/widgets/score_circle.dart';
+import 'package:utspemob/screens/review_answer.dart';
+import 'package:utspemob/widgets/theme_toggle_button.dart';
+import '../main.dart';
 
 class ResultScreen extends StatelessWidget {
   final QuizState quizState;
@@ -30,8 +34,10 @@ class ResultScreen extends StatelessWidget {
   }
 
   void _reviewAnswer(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fitur Review Jawaban Belum Diimplementasikan!')),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ReviewScreen(quizState: quizState),
+      ),
     );
   }
 
@@ -41,6 +47,7 @@ class ResultScreen extends StatelessWidget {
     required String label,
     required double screenWidth,
     required double screenHeight,
+    required Color labelColor,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +76,7 @@ class ResultScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: screenWidth * 0.045,
-            color: const Color(0xFF2B252C),
+            color: labelColor,
             fontWeight: FontWeight.w400,
             fontFamily: 'DM Sans',
           ),
@@ -84,6 +91,7 @@ class ResultScreen extends StatelessWidget {
     required VoidCallback onPressed,
     required Color iconBackgroundColor,
     required double screenWidth,
+    required Color labelColor,
   }) {
     final double iconSize = screenWidth * 0.08;
     final double containerSize = screenWidth * 0.18;
@@ -102,11 +110,11 @@ class ResultScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: iconBackgroundColor,
                 shape: BoxShape.circle,
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
+                    color: Colors.black.withOpacity(0.5),
                     blurRadius: 5,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -122,7 +130,7 @@ class ResultScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: const Color(0xFF2B252C),
+            color: labelColor,
             fontSize: screenWidth * 0.042,
             fontWeight: FontWeight.w400,
             fontFamily: 'DM Sans',
@@ -136,41 +144,49 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final colorScheme = Theme.of(context).colorScheme;
+    final themeColors = Theme.of(context).extension<ThemeColors>() ?? ThemeColors.defaults;
+
+    final double maxContentWidth = 600;
+    final bool isWideScreen = screenWidth > maxContentWidth;
+    final double adjustedScreenWidth = isWideScreen ? maxContentWidth : screenWidth;
 
     final String actualScore = _totalScorePoints.toString();
     final double completionValue = _totalQuestions > 0 ? (quizState.userAnswers.where((a) => a != null).length / _totalQuestions) * 100 : 100;
     final String completion = completionValue.round().toString() + '%';
-
     final String totalQ = _totalQuestions.toString().padLeft(2, '0');
     final String correct = _correctAnswers.toString().padLeft(2, '0');
     final String wrong = _wrongAnswers.toString().padLeft(2, '0');
 
-    final double innerContainerWidth = screenWidth * (337 / 360);
+    final double innerContainerWidth = adjustedScreenWidth * (337 / 360);
     final double innerContainerHeight = screenHeight * (673 / 717);
-    final double scoreCircleBaseSize = screenWidth * (116 / 360);
+    final double scoreCircleBaseSize = adjustedScreenWidth * (116 / 360);
+
+    final Color primaryBlue = colorScheme.primary;
+    final Color correctGreen = themeColors.scoreGreen;
+    final Color wrongRed = themeColors.scoreRed;
+    final Color homePurple = themeColors.homeButtonColor;
+    final Color mainBgColor = colorScheme.background;
+    final Color cardColor = themeColors.cardColor;
+    final Color onCardText = colorScheme.onBackground;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFECF8FF),
+      backgroundColor: mainBgColor,
       body: Center(
-        child: Container(
-          width: screenWidth,
+        child: SizedBox(
+          width: adjustedScreenWidth,
           height: screenHeight,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: const Color(0xFFECF8FF),
-            borderRadius: BorderRadius.circular(30),
-          ),
           child: Stack(
             children: [
               Positioned(
-                left: screenWidth * (11 / 360),
+                left: adjustedScreenWidth * (11 / 360),
                 top: screenHeight * (26 / 717),
                 child: Container(
                   width: innerContainerWidth,
                   height: innerContainerHeight,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Stack(
@@ -179,9 +195,9 @@ class ResultScreen extends StatelessWidget {
                         width: innerContainerWidth,
                         height: innerContainerHeight * (334 / 673),
                         child: Container(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF3F9ED1),
-                            borderRadius: BorderRadius.only(
+                          decoration: BoxDecoration(
+                            color: primaryBlue,
+                            borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(30),
                               topRight: Radius.circular(30),
                             ),
@@ -191,21 +207,31 @@ class ResultScreen extends StatelessWidget {
                       Positioned(
                         top: innerContainerHeight * (30 / 673),
                         left: innerContainerWidth * (10 / 337),
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
-                          onPressed: () => Navigator.of(context).pop(),
+                        right: innerContainerWidth * (10 / 337),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary, size: 30),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            const ThemeToggleButton(),
+                          ],
                         ),
                       ),
-                      Positioned(top: innerContainerHeight * (88/673), left: innerContainerWidth * (279/337) - innerContainerWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: innerContainerWidth * 0.18))),
-                      Positioned(top: innerContainerHeight * (-34/673), left: innerContainerWidth * (78/337) - innerContainerWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: innerContainerWidth * 0.18))),
-                      Positioned(top: innerContainerHeight * (16/673), left: innerContainerWidth * (207/337) - innerContainerWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: innerContainerWidth * 0.08))),
-                      Positioned(top: innerContainerHeight * (69/673), left: innerContainerWidth * (-45/337) - innerContainerWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: innerContainerWidth * 0.18))),
+                      Positioned(top: innerContainerHeight * (88/673), left: innerContainerWidth * (279/337) - adjustedScreenWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: adjustedScreenWidth * 0.18, color: colorScheme.onPrimary))),
+                      Positioned(top: innerContainerHeight * (-34/673), left: innerContainerWidth * (78/337) - adjustedScreenWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: adjustedScreenWidth * 0.18, color: colorScheme.onPrimary))),
+                      Positioned(top: innerContainerHeight * (16/673), left: innerContainerWidth * (207/337) - adjustedScreenWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: adjustedScreenWidth * 0.08, color: colorScheme.onPrimary))),
+                      Positioned(top: innerContainerHeight * (69/673), left: innerContainerWidth * (-45/337) - adjustedScreenWidth * 0.05, child: Opacity(opacity: 0.25, child: CircleWidget(size: adjustedScreenWidth * 0.18, color: colorScheme.onPrimary))),
                       Positioned(
                         left: innerContainerWidth * (82 / 337),
                         top: innerContainerHeight * (56 / 673),
                         child: ScoreCircle(
                           score: int.parse(actualScore),
                           circleSize: scoreCircleBaseSize,
+                          primaryColor: primaryBlue,
+                          onPrimaryColor: colorScheme.onPrimary,
+                          backgroundColor: cardColor,
                         ),
                       ),
                       Positioned(
@@ -222,13 +248,13 @@ class ResultScreen extends StatelessWidget {
                               vertical: innerContainerHeight * 0.03,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: cardColor,
                               borderRadius: BorderRadius.circular(30),
-                              boxShadow: const [
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Color(0x7F000000),
+                                  color: Colors.black.withOpacity(0.15),
                                   blurRadius: 4,
-                                  offset: Offset(0, 4),
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
@@ -239,18 +265,20 @@ class ResultScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
                                     _buildStatItem(
-                                      color: const Color(0xFF3F9ED1),
+                                      color: primaryBlue,
                                       value: completion,
                                       label: 'Completion',
                                       screenWidth: innerContainerWidth,
                                       screenHeight: innerContainerHeight,
+                                      labelColor: onCardText,
                                     ),
                                     _buildStatItem(
-                                      color: const Color(0xFF3F9ED1),
+                                      color: primaryBlue,
                                       value: totalQ,
                                       label: 'Total Question',
                                       screenWidth: innerContainerWidth,
                                       screenHeight: innerContainerHeight,
+                                      labelColor: onCardText,
                                     ),
                                   ],
                                 ),
@@ -258,18 +286,20 @@ class ResultScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
                                     _buildStatItem(
-                                      color: const Color(0xFF1E8334),
+                                      color: correctGreen,
                                       value: correct,
                                       label: 'Correct',
                                       screenWidth: innerContainerWidth,
                                       screenHeight: innerContainerHeight,
+                                      labelColor: onCardText,
                                     ),
                                     _buildStatItem(
-                                      color: const Color(0xFFF93838),
+                                      color: wrongRed,
                                       value: wrong,
                                       label: 'Wrong',
                                       screenWidth: innerContainerWidth,
                                       screenHeight: innerContainerHeight,
+                                      labelColor: onCardText,
                                     ),
                                   ],
                                 ),
@@ -289,22 +319,25 @@ class ResultScreen extends StatelessWidget {
                               icon: Icons.refresh,
                               label: 'Play Again',
                               onPressed: () => _playAgain(context),
-                              iconBackgroundColor: const Color(0xFF3F9ED1),
+                              iconBackgroundColor: primaryBlue,
                               screenWidth: innerContainerWidth,
+                              labelColor: onCardText,
                             ),
                             _buildActionButton(
                               icon: Icons.remove_red_eye_outlined,
                               label: 'Review Answer',
                               onPressed: () => _reviewAnswer(context),
-                              iconBackgroundColor: const Color(0xFF3F9ED1),
+                              iconBackgroundColor: CupertinoColors.systemOrange,
                               screenWidth: innerContainerWidth,
+                              labelColor: onCardText,
                             ),
                             _buildActionButton(
                               icon: Icons.home,
                               label: 'Home',
                               onPressed: () => _goToHome(context),
-                              iconBackgroundColor: const Color(0xFFAD89E7),
+                              iconBackgroundColor: homePurple,
                               screenWidth: innerContainerWidth,
+                              labelColor: onCardText,
                             ),
                           ],
                         ),

@@ -20,6 +20,8 @@ class QuizState {
     this.userName = 'Pemain',
   }) : userAnswers = List.filled(questions.length, null);
 
+  int get currentQuestionIndex => userAnswers.where((answer) => answer != null).length;
+  bool get isQuizFinished => currentQuestionIndex >= questions.length;
   int get score {
     int correctCount = 0;
     for (int i = 0; i < questions.length; i++) {
@@ -29,12 +31,4 @@ class QuizState {
     }
     return correctCount;
   }
-
-  int get currentQuestionIndex =>
-      userAnswers.where((answer) => answer != null).length < questions.length
-          ? userAnswers.where((answer) => answer != null).length
-          : questions.length - 1;
-
-  bool get isQuizFinished =>
-      userAnswers.where((answer) => answer != null).length >= questions.length;
 }

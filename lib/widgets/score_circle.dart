@@ -3,41 +3,49 @@ import 'package:flutter/material.dart';
 class ScoreCircle extends StatelessWidget {
   final int score;
   final double circleSize;
+  final Color primaryColor; 
+  final Color onPrimaryColor;
+  final Color backgroundColor;
 
   const ScoreCircle({
     super.key,
     required this.score,
     required this.circleSize,
+    required this.primaryColor,
+    required this.onPrimaryColor,
+    required this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryBlue = Color(0xFF3F9ED1);
     
+    final Color primaryBlue = primaryColor;
+    final Color onPrimary = onPrimaryColor;
+
     return Container(
-      width: circleSize * 1.5, 
+      width: circleSize * 1.5,
       height: circleSize * 1.5,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
+        color: onPrimary.withOpacity(0.3), 
         shape: BoxShape.circle,
       ),
-      child: Center( 
+      child: Center(
         child: Container(
           width: circleSize * 1.2,
           height: circleSize * 1.2,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: onPrimary.withOpacity(0.5),
             shape: BoxShape.circle,
           ),
-          child: Center( 
+          child: Center(
             child: Container(
               width: circleSize,
               height: circleSize,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: backgroundColor, 
                 shape: BoxShape.circle,
               ),
-              child: Column( 
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -78,8 +86,8 @@ class ScoreCircle extends StatelessWidget {
               ),
             ),
           ),
+        ),
       ),
-     )
     );
   }
 }

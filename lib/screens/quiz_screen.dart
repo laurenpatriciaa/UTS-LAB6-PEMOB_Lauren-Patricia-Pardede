@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:utspemob/data/quiz_data.dart';
 import 'package:utspemob/models/quiz_model.dart';
 import 'package:utspemob/screens/result_screen.dart';
 import 'package:utspemob/widgets/quiz_header.dart';
 import 'package:utspemob/widgets/quiz_option_button.dart';
+import 'package:utspemob/widgets/theme_toggle_button.dart';
+import '../main.dart';
 
 class QuizScreen extends StatefulWidget {
   final QuizState quizState;
@@ -62,6 +63,8 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final colorScheme = Theme.of(context).colorScheme;
+    final themeColors = Theme.of(context).extension<ThemeColors>() ?? ThemeColors.defaults;
 
     final currentQuestionIndex = widget.quizState.currentQuestionIndex;
     final totalQuestions = widget.quizState.questions.length;
@@ -73,20 +76,28 @@ class _QuizScreenState extends State<QuizScreen> {
         ? widget.quizState.questions[currentQuestionIndex]
         : widget.quizState.questions.last;
 
-    final double headerHeight = screenHeight * 0.22;
-    final double cardTopPosition = screenHeight * 0.15;
-    final double optionsTopPadding = screenHeight * 0.35;
+    final double headerHeight = screenHeight * 0.18; // dikurangi
+    final double cardTopPosition = screenHeight * 0.12; // dikurangi
+    final double optionsTopPadding = screenHeight * 0.3; // dikurangi
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F4F8),
+      backgroundColor: colorScheme.background,
       body: Stack(
         children: [
           QuizHeader(
             height: headerHeight,
             width: screenWidth,
-            content: Container(),
+            content: Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const ThemeToggleButton(),
+                  SizedBox(width: screenWidth * 0.02),
+                ],
+              ),
+            ),
           ),
-
           Positioned(
             top: cardTopPosition,
             left: screenWidth * 0.05,
@@ -94,52 +105,65 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              color: colorScheme.surface,
               child: Padding(
-                padding: EdgeInsets.all(screenWidth * 0.06),
+                padding: EdgeInsets.all(screenWidth * 0.04), // padding dikurangi
                 child: Column(
                   children: [
+                    if (widget.quizState.userName.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: screenHeight * 0.008),
+                        child: Text(
+                          'Halo, ${widget.quizState.userName}!',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.042,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           score.toString().padLeft(2, '0'),
                           style: TextStyle(
-                            color: const Color(0xFF4CAF50),
-                            fontSize: screenWidth * 0.05,
+                            color: themeColors.scoreGreen,
+                            fontSize: screenWidth * 0.045,
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.01),
-                        Container(width: screenWidth * 0.1, height: 5, color: const Color(0xFF4CAF50)),
+                        Container(width: screenWidth * 0.09, height: 4, color: themeColors.scoreGreen),
                         SizedBox(width: screenWidth * 0.02),
                         Text(
                           'Question ${questionsAnswered + 1}/$totalQuestions',
                           style: TextStyle(
-                            color: const Color(0xFF3B89A3),
-                            fontSize: screenWidth * 0.045,
+                            color: colorScheme.onSurface,
+                            fontSize: screenWidth * 0.042,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.02),
-                        Container(width: screenWidth * 0.1, height: 5, color: const Color(0xFFF44336)),
+                        Container(width: screenWidth * 0.09, height: 4, color: themeColors.scoreRed),
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           wrongAnswers.toString().padLeft(2, '0'),
                           style: TextStyle(
-                            color: const Color(0xFFF44336),
-                            fontSize: screenWidth * 0.05,
+                            color: themeColors.scoreRed,
+                            fontSize: screenWidth * 0.045,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: screenHeight * 0.02),
+                    SizedBox(height: screenHeight * 0.015), // jarak dikurangi
                     Text(
                       questionToShow.questionText,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'SmartifyFont',
-                        fontSize: screenWidth * 0.055,
+                        fontSize: screenWidth * 0.05, // font size dikurangi
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF2E4E6A),
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -147,7 +171,6 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
-
           Padding(
             padding: EdgeInsets.only(top: optionsTopPadding),
             child: SizedBox(
@@ -156,44 +179,48 @@ class _QuizScreenState extends State<QuizScreen> {
                 children: [
                   SizedBox(height: screenHeight * 0.02),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ...questionToShow.options.asMap().entries.map((entry) {
-                          int idx = entry.key;
-                          String option = entry.value;
-                          return QuizOptionButton(
-                            text: option,
-                            onPressed: () => _selectAnswer(idx),
-                            optionIndex: idx,
-                            selectedIndex: _temporarySelectedIndex,
-                          );
-                        }).toList(),
-                      ],
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                      child: Column(
+                        children: [
+                          SizedBox(height: screenHeight * 0.01),
+                          ...questionToShow.options.asMap().entries.map((entry) {
+                            int idx = entry.key;
+                            String option = entry.value;
+                            return Padding(
+                              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+                              child: QuizOptionButton(
+                                text: option,
+                                onPressed: () => _selectAnswer(idx),
+                                optionIndex: idx,
+                                selectedIndex: _temporarySelectedIndex,
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(bottom: screenHeight * 0.01, top: screenHeight * 0.04),
+                    padding: EdgeInsets.only(bottom: screenHeight * 0.01, top: screenHeight * 0.02),
                     child: SizedBox(
                       width: screenWidth * 0.85,
                       height: screenHeight * 0.085,
                       child: ElevatedButton(
                         onPressed: _goToNextQuestion,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _temporarySelectedIndex != null
-                              ? const Color(0xFF3B89A3)
-                              : const Color(0xFFAAB8C2),
+                          backgroundColor: colorScheme.secondary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          elevation: _temporarySelectedIndex != null ? 8 : 0,
+                          elevation: _temporarySelectedIndex != null ? 8 : 4,
+                          foregroundColor: colorScheme.onSecondary,
                         ),
                         child: Text(
                           (questionsAnswered + 1) == totalQuestions ? 'Lihat Hasil' : 'Selanjutnya',
                           style: TextStyle(
                             fontSize: screenWidth * 0.06,
-                            color: Colors.white,
+                            color: colorScheme.onSecondary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

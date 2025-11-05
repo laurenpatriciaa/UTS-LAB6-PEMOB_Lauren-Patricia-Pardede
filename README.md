@@ -28,5 +28,8 @@ Lab  : 6
 4. Vidio Aplikasi
  
   https://github.com/user-attachments/assets/e6e9248f-53fb-4eae-8a1c-ec68dd868670
+
+# Link mockup/prototype Aplikasi
+https://www.figma.com/design/HyUCM77o88ZE6ojOUyZDLW/Untitled?node-id=0-1&p=f&t=NyOmkIBMrY9kWOFp-0
   
   

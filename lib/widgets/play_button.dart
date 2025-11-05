@@ -21,13 +21,12 @@ class PlayButton extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
-        // Kriteria 1: Warna Tombol Play diubah menjadi #3B89A3
         decoration: BoxDecoration(
-          color: const Color(0xFF3B89A3), 
-          borderRadius: BorderRadius.circular(20.0), 
+          color: const Color(0xFF3B89A3),
+          borderRadius: BorderRadius.circular(20.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.35), 
+              color: Colors.black.withOpacity(0.35),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),

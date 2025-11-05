@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:utspemob/widgets/play_button.dart';
 import 'package:utspemob/widgets/circle_widgets.dart';
+import 'package:utspemob/data/quiz_data.dart'; 
+import 'package:utspemob/models/quiz_model.dart';
+import 'package:utspemob/screens/quiz_screen.dart';
 
 const String _imageAssetPath = 'assets/logo.png';
 
@@ -25,7 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ? 'Pemain'
         : _nameController.text.trim();
 
-    print('Tombol Play ditekan! Siap untuk memulai game dengan nama: $userName');
+    final QuizState newQuizState = QuizState(
+      questions: dummyQuestions,
+      userName: userName,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QuizScreen(quizState: newQuizState),
+      ),
+    );
   }
 
   @override
@@ -40,54 +52,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Stack(
           children: [
-            Positioned(
-              top: screenHeight * 0.70,
-              left: screenWidth * -0.15,
-              child: Opacity(
-                opacity: 0.2,
-                child: CircleWidget(size: screenWidth * 0.5),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.45,
-              right: screenWidth * -0.1,
-              child: Opacity(
-                opacity: 0.2,
-                child: CircleWidget(size: screenWidth * 0.4),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.85,
-              right: screenWidth * -0.15,
-              child: Opacity(
-                opacity: 0.2,
-                child: CircleWidget(size: screenWidth * 0.5),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.58,
-              left: screenWidth * 0.05,
-              child: Opacity(
-                opacity: 0.2,
-                child: CircleWidget(size: screenWidth * 0.15),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.1,
-              left: screenWidth * -0.05,
-              child: Opacity(
-                opacity: 0.2,
-                child: CircleWidget(size: screenWidth * 0.3),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.05,
-              right: screenWidth * 0.1,
-              child: Opacity(
-                opacity: 0.2,
-                child: CircleWidget(size: screenWidth * 0.15),
-              ),
-            ),
+            Positioned(top: screenHeight * 0.70, left: screenWidth * -0.15, child: Opacity(opacity: 0.2, child: CircleWidget(size: screenWidth * 0.5))),
+            Positioned(top: screenHeight * 0.45, right: screenWidth * -0.1, child: Opacity(opacity: 0.2, child: CircleWidget(size: screenWidth * 0.4))),
+            Positioned(top: screenHeight * 0.85, right: screenWidth * -0.15, child: Opacity(opacity: 0.2, child: CircleWidget(size: screenWidth * 0.5))),
+            Positioned(top: screenHeight * 0.58, left: screenWidth * 0.05, child: Opacity(opacity: 0.2, child: CircleWidget(size: screenWidth * 0.15))),
+            Positioned(top: screenHeight * 0.1, left: screenWidth * -0.05, child: Opacity(opacity: 0.2, child: CircleWidget(size: screenWidth * 0.3))),
+            Positioned(top: screenHeight * 0.05, right: screenWidth * 0.1, child: Opacity(opacity: 0.2, child: CircleWidget(size: screenWidth * 0.15))),
+
             Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
@@ -145,7 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             horizontal: screenWidth * 0.05,
                           ),
                           border: InputBorder.none,
-                          hintText: '',
                         ),
                         style: TextStyle(fontSize: screenWidth * 0.05),
                       ),
